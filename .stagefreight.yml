@@ -250,8 +250,17 @@ lint:
           docker_images: true
           github_releases: true
           go_modules: true
+        # Version lag is maintenance, not a vulnerability: a major behind warns, it does
+        # not fail CI (some "latest" targets are even pre-releases you would not adopt).
+        # Known CVEs still escalate to critical via vulnerability.severity_override below,
+        # so real security continues to block the pipeline.
+        severity:
+          major: 1
+          minor: 1
+          patch: 0
         vulnerability:
           enabled: true
+          severity_override: true
     tabs:
       enabled: true
     secrets:
