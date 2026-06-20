@@ -28,11 +28,15 @@ versioning:
     mode: error
 
 builds:
-  # The image is a regular multi-stage Dockerfile build. It produces the
-  # dragonfly binary image (cargo build inside the Dockerfile).
+  # The image recycles the dragonfly-bin binary: stage copies it into the build context
+  # as dragonfly-<arch>, which the Dockerfile's `COPY dragonfly-${TARGETARCH}` consumes
+  # (static/templates dirs are already in-context) — no recompiling inside the image.
   - id: dragonfly
     kind: docker
     platforms: [linux/amd64]
+    stage:
+      from: dragonfly-bin
+      as: "dragonfly-{arch}"
 
   - id: dragonfly-bin
     kind: binary
