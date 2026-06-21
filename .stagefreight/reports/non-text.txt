@@ -1,0 +1,2 @@
+static/img/racks.webp	webp
+static/sounds/rocket-ignition.mp3	binary

@@ -143,9 +143,11 @@ mod tests {
 
     #[test]
     fn test_hash_token_deterministic() {
-        let token = "df_aabbccdd11223344556677889900aabbccdd11223344556677889900aabbccdd11223344556677889900aabbccdd1122";
-        let h1 = hash_token(token);
-        let h2 = hash_token(token);
+        // Use the real generator rather than a hardcoded token-shaped literal: determinism
+        // comes from hashing the SAME value twice, not from a specific input.
+        let token = generate_raw_token();
+        let h1 = hash_token(&token);
+        let h2 = hash_token(&token);
         assert_eq!(h1, h2, "Hashing the same token must produce the same hash");
         // SHA-256 output is 64 hex chars
         assert_eq!(h1.len(), 64);
@@ -160,9 +162,13 @@ mod tests {
 
     #[test]
     fn test_token_prefix_extraction() {
-        let token = "df_aabbccdd1122334455667788";
-        let prefix = token_prefix(token);
-        assert_eq!(prefix, "df_aabbccdd");
+        // Derive the expectation structurally from a real generated token instead of matching
+        // a hardcoded token-shaped literal — keeps the assertion exact without committing a
+        // credential-shaped string to source.
+        let token = generate_raw_token();
+        let prefix = token_prefix(&token);
+        assert_eq!(prefix, format!("df_{}", &token[3..11]));
+        assert_eq!(prefix.len(), TOKEN_PREFIX.len() + PREFIX_DISPLAY_LEN);
     }
 
     #[test]
