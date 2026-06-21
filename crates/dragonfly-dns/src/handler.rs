@@ -7,12 +7,12 @@
 use async_trait::async_trait;
 use dragonfly_common::dns::{DnsRecord, DnsRecordType};
 use hickory_proto::rr::rdata::{A, AAAA, CNAME, NS, PTR, SOA, TXT};
-use hickory_proto::rr::{LowerName, Name, RData, Record, RecordSet, RecordType};
-use hickory_server::authority::{
-    AuthLookup, Authority, LookupControlFlow, LookupError, LookupOptions, LookupRecords,
-    UpdateResult, ZoneType,
-};
+use hickory_proto::rr::{LowerName, Name, RData, Record, RecordSet, RecordType, TSigResponseContext};
 use hickory_server::server::{Request, RequestInfo};
+use hickory_server::zone_handler::{
+    AuthLookup, AxfrPolicy, LookupControlFlow, LookupError, LookupOptions, LookupRecords,
+    ZoneHandler, ZoneType,
+};
 use std::net::{Ipv4Addr, Ipv6Addr};
 use std::str::FromStr;
 use std::sync::Arc;
@@ -244,19 +244,19 @@ impl StoreAuthority {
 }
 
 #[async_trait]
-impl Authority for StoreAuthority {
-    type Lookup = AuthLookup;
-
+// hickory 0.26 renamed the `Authority` trait to `ZoneHandler` and reshaped it: AXFR is now a
+// policy enum, `search` returns an optional TSIG response signer, and `update`/`consult`/
+// `zone_transfer` gained defaults (so we drop them). The NSEC3/DNSSEC and metrics methods are
+// feature-gated (`__dnssec`/`metrics`) and absent here — dragonfly enables neither. This is a
+// non-DNSSEC, read-only, store-backed primary authority, so the new surface is deny/empty —
+// the behavior it already had. The actual resolution logic (store_lookup) is unchanged.
+impl ZoneHandler for StoreAuthority {
     fn zone_type(&self) -> ZoneType {
         ZoneType::Primary
     }
 
-    fn is_axfr_allowed(&self) -> bool {
-        false
-    }
-
-    async fn update(&self, _update: &Request) -> UpdateResult<bool> {
-        Ok(false)
+    fn axfr_policy(&self) -> AxfrPolicy {
+        AxfrPolicy::Deny
     }
 
     fn origin(&self) -> &LowerName {
@@ -267,26 +267,35 @@ impl Authority for StoreAuthority {
         &self,
         name: &LowerName,
         rtype: RecordType,
+        _request_info: Option<&RequestInfo<'_>>,
         _lookup_options: LookupOptions,
-    ) -> LookupControlFlow<Self::Lookup> {
+    ) -> LookupControlFlow<AuthLookup> {
         self.store_lookup(name, rtype).await
     }
 
     async fn search(
         &self,
-        request_info: RequestInfo<'_>,
+        request: &Request,
         lookup_options: LookupOptions,
-    ) -> LookupControlFlow<Self::Lookup> {
+    ) -> (LookupControlFlow<AuthLookup>, Option<TSigResponseContext>) {
+        let request_info = match request.request_info() {
+            Ok(info) => info,
+            Err(e) => return (LookupControlFlow::Break(Err(e)), None),
+        };
         let name = request_info.query.name();
         let rtype = request_info.query.query_type();
-        self.lookup(name, rtype, lookup_options).await
+        (
+            self.lookup(name, rtype, Some(&request_info), lookup_options)
+                .await,
+            None,
+        )
     }
 
-    async fn get_nsec_records(
+    async fn nsec_records(
         &self,
         _name: &LowerName,
         _lookup_options: LookupOptions,
-    ) -> LookupControlFlow<Self::Lookup> {
+    ) -> LookupControlFlow<AuthLookup> {
         LookupControlFlow::Break(Ok(AuthLookup::Empty))
     }
 }

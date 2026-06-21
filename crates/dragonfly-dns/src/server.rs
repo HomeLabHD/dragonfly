@@ -4,8 +4,8 @@
 //! and ForwardAuthority for recursive forwarding to upstreams.
 
 use crate::handler::{DnsStore, StoreAuthority, ZoneConfig};
-use hickory_server::ServerFuture;
-use hickory_server::authority::{Authority, Catalog};
+use hickory_server::Server;
+use hickory_server::zone_handler::{Catalog, ZoneHandler};
 use std::net::SocketAddr;
 use std::sync::Arc;
 use std::time::Duration;
@@ -46,9 +46,12 @@ impl DnsServer {
 
         info!(addr = %bind_addr, zones = zones.len(), "DNS server listening (UDP + TCP)");
 
-        let mut server = ServerFuture::new(catalog);
+        // hickory 0.26 requires an explicit per-connection outgoing-response buffer depth on
+        // register_listener (a count, not bytes — hickory's own examples use ~32).
+        const TCP_RESPONSE_BUFFER: usize = 100;
+        let mut server = Server::new(catalog);
         server.register_socket(udp_socket);
-        server.register_listener(tcp_listener, Duration::from_secs(30));
+        server.register_listener(tcp_listener, Duration::from_secs(30), TCP_RESPONSE_BUFFER);
 
         // Run until shutdown
         server.block_until_done().await?;

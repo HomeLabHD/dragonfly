@@ -70,7 +70,7 @@ dragonfly-dns = { path = "../dragonfly-dns" }
 
 # Async compression and tar for image cache
 async-compression = { version = "0.4", features = ["tokio", "gzip", "zstd"] }
-astral-tokio-tar = "0.5"
+astral-tokio-tar = "0.6"
 tokio-util = { version = "0.7", features = ["io"] }
 
 # Storage — SQLite via sqlx (already in deps above)

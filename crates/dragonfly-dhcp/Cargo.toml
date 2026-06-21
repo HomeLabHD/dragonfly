@@ -16,7 +16,7 @@ uuid = { workspace = true }
 async-trait = "0.1"
 
 # DHCP protocol
-dhcproto = "0.14"
+dhcproto = "0.15"
 
 # Networking
 socket2 = { version = "0.5", features = ["all"] }

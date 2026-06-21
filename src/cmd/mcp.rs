@@ -547,23 +547,25 @@ fn api_err(e: impl std::fmt::Display) -> ErrorData {
 #[tool_handler]
 impl ServerHandler for DragonflyMcp {
     fn get_info(&self) -> ServerInfo {
-        ServerInfo {
-            protocol_version: ProtocolVersion::V_2024_11_05,
-            capabilities: ServerCapabilities::builder().enable_tools().build(),
-            server_info: Implementation {
-                name: "dragonfly".to_string(),
-                version: env!("CARGO_PKG_VERSION").to_string(),
-                title: Some("Dragonfly".to_string()),
-                description: Some("Bare metal infrastructure management".to_string()),
-                icons: None,
-                website_url: None,
-            },
-            instructions: Some(
-                "Dragonfly bare metal management. Single tool with action-based dispatch. \
-                 Call with action=\"help\" for the full manual of available actions."
-                    .to_string(),
-            ),
-        }
+        // rmcp 1.x marks ServerInfo (InitializeResult) and Implementation #[non_exhaustive],
+        // so struct-literal construction is no longer allowed from outside the crate. Build
+        // from the provided defaults and assign fields, preserving the same values.
+        let mut server_info = Implementation::from_build_env();
+        server_info.name = "dragonfly".to_string();
+        server_info.version = env!("CARGO_PKG_VERSION").to_string();
+        server_info.title = Some("Dragonfly".to_string());
+        server_info.description = Some("Bare metal infrastructure management".to_string());
+
+        let mut info = ServerInfo::default();
+        info.protocol_version = ProtocolVersion::V_2024_11_05;
+        info.capabilities = ServerCapabilities::builder().enable_tools().build();
+        info.server_info = server_info;
+        info.instructions = Some(
+            "Dragonfly bare metal management. Single tool with action-based dispatch. \
+             Call with action=\"help\" for the full manual of available actions."
+                .to_string(),
+        );
+        info
     }
 }
 

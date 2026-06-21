@@ -32,7 +32,7 @@ thiserror = "1.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
-jetpack = { git = "https://github.com/riffcc/jetpack", rev = "a212fd92049243c157ebc853eade28db593ef9b5" }
+jetpack = { git = "https://gitlab.prplanit.com/riff.cc/jetpack.git", tag = "v0.5.2-alpha2" }
 ssh-key = { version = "0.6", features = ["ed25519", "rand_core", "std"] }
 
 [package]
@@ -109,7 +109,7 @@ include_dir = "0.7"
 notify = "6.1"
 
 # MCP server
-rmcp = { version = "0.16", features = ["server", "macros", "transport-io"] }
+rmcp = { version = "1", features = ["server", "macros", "transport-io"] }
 schemars = "1"
 
 # Automation & Progress
