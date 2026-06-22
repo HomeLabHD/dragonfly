@@ -171,7 +171,10 @@ pub fn fs_info<P: ?Sized + nix::NixPath>(path: &P) -> nix::Result<FileSystemInfo
         available: stat.f_bavail * block_size,
         total_inodes: stat.f_files,
         free_inodes: stat.f_ffree,
-        fs_type: stat.f_type,
+        // f_type is glibc's signed __fsword_t (i64) but musl's unsigned c_ulong
+        // (u64); cast for the musl target. The value is an opaque fs magic id, so
+        // the reinterpretation is harmless — no signed arithmetic is done on it.
+        fs_type: stat.f_type as i64,
         fs_id: stat.f_fsid,
     })
 }
