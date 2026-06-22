@@ -28,7 +28,7 @@ hyper = { version = "1", optional = true }
 proxmox-serde = { git = "https://github.com/proxmox/proxmox-rs", features = ["perl"] }
 
 [dev-dependencies]
-serde_plain = "1"
+serde_plain = "1.0.2"
 
 [features]
 default = []

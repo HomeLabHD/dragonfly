@@ -22,7 +22,7 @@ tokio = { version = "1", features = [], optional = true }
 sha1 = { version = "0.10", optional = true }
 tokio-rustls = { version = "0.26", optional = true, default-features = false, features = ["tls12", "ring"] }
 tower-service = { version = "0.3", optional = true }
-ureq = { version = "3.0", optional = true, default-features = false }
+ureq = { version = "3.3.0", optional = true, default-features = false }
 url = { version = "2", optional = true }
 webpki-roots = { version = "0.26", optional = true }
 
