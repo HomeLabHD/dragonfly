@@ -8,7 +8,7 @@ matchers:
     main: "^main$"
 
 vars:
-  org: riffcc
+  org: hlhd
   github_org: HomeLabHD   # our fork — github.com/HomeLabHD/dragonfly; never the riffcc upstream
   gitlab_group: riff.cc
   repo: dragonfly
