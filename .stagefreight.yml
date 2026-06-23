@@ -86,6 +86,14 @@ registries:
     credentials: HARBOR
     default_path: "{var:org}/{var:repo}"
 
+  # GitHub Container Registry. On GitHub Actions, StageFreight auto-wires GHCR_USER/
+  # GHCR_TOKEN from the runner's GITHUB_TOKEN (packages: write) — no configured secret.
+  - id: ghcr
+    provider: ghcr
+    url: ghcr.io
+    credentials: GHCR
+    default_path: "homelabhd/{var:repo}"   # ghcr namespace = github owner, lowercased
+
 targets:
   # ── Docker Hub: stable releases ─────────────────────────────────
   - id: dockerhub-stable
@@ -118,6 +126,14 @@ targets:
   - id: harbor-dev
     kind: registry
     registry: harbor
+    build: dragonfly
+    tags: ["dev-{sha:8}", "latest-dev"]
+    when: { branches: [main], events: [push] }
+
+  # ── GHCR: dev builds on every commit (turnkey on GitHub Actions) ─
+  - id: ghcr-dev
+    kind: registry
+    registry: ghcr
     build: dragonfly
     tags: ["dev-{sha:8}", "latest-dev"]
     when: { branches: [main], events: [push] }

@@ -165,6 +165,12 @@ jobs:
       image: docker.io/prplanit/stagefreight:latest-dev
     needs: [perform, review]
     continue-on-error: true
+    permissions:
+      contents: read
+      packages: write
+    env:
+      GHCR_USER: ${{ github.actor }}
+      GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
