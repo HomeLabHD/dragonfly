@@ -32,7 +32,7 @@ thiserror = "1.0"
 tracing = "0.1"
 tracing-subscriber = "0.3"
 reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
-jetpack = { git = "https://gitlab.prplanit.com/riff.cc/jetpack.git", tag = "v0.5.2-alpha2" }
+jetpack = { git = "https://github.com/HomeLabHD/jetpack.git", tag = "v0.5.2-alpha2" }
 ssh-key = { version = "0.6", features = ["ed25519", "rand_core", "std"] }
 
 [package]

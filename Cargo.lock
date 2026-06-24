@@ -3835,7 +3835,7 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 [[package]]
 name = "jetpack"
 version = "0.5.0"
-source = "git+https://gitlab.prplanit.com/riff.cc/jetpack.git?tag=v0.5.2-alpha2#708324fed8039c43dbf52cdb06d63230c2a8c126"
+source = "git+https://github.com/HomeLabHD/jetpack.git?tag=v0.5.2-alpha2#708324fed8039c43dbf52cdb06d63230c2a8c126"
 dependencies = [
  "chrono",
  "expanduser",
