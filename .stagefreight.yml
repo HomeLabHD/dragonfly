@@ -117,7 +117,8 @@ targets:
     registry: dockerhub
     build: dragonfly
     tags: ["dev-{sha:8}", "latest-dev"]
-    when: { branches: [main], events: [push] }
+    # Docker Hub has no push creds on the GitHub fork → gitlab-only.
+    when: { branches: [main], events: [push], forges: [gitlab] }
     retention:
       keep_last: 6
       protect: ["latest-dev"]
@@ -128,7 +129,8 @@ targets:
     registry: harbor
     build: dragonfly
     tags: ["dev-{sha:8}", "latest-dev"]
-    when: { branches: [main], events: [push] }
+    # Private Harbor (cr.pcfae.com) isn't reachable from a hosted GitHub runner → gitlab-only.
+    when: { branches: [main], events: [push], forges: [gitlab] }
 
   # ── GHCR: dev builds on every commit (turnkey on GitHub Actions) ─
   - id: ghcr-dev
